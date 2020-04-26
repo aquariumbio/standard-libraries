@@ -1,15 +1,25 @@
-# Standard Libraries, version 0.0.1
+# UW BIOFAB Standard Libraries, version 0.0.1
 
-A workflow that does x, y and z [[Download](standard-libraries.aq)] [[Github Repo](https://github.com/klavinslab/standard-libraries)]
+Standard libraries for UW BIOFAB [[Download](standard-libraries.aq)] [[Github Repo](https://github.com/klavinslab/standard-libraries)]
 
-&copy; My Organization
+&copy; University of Washington
 
-
+### Keywords
+constants, association, input/output, provenance, tube labels, units
 ### Maintainer
-- Devin Strickland, <dvn.strcklnd@gmail.com>
+- Ben Keller, <bjkeller@uw.edu>
 
 ### Authors
+  - Garret Newman, University of Washington
   - Devin Strickland, University of Washington
+  - Abraham Miller, University of Washington
+  - Orlando de Lange, University of Washington
+  - Yokesh Jayakumar, University of Washington
+  - Sarah Goldberg, University of Washington
+  - Erriberto Lopez, University of Washington
+  - Jon Luntzel, University of Washington
+  - Cannon Mallory, University of Washington
+  - Ben Keller, University of Washington
 
 ### Acknowledgements
 
