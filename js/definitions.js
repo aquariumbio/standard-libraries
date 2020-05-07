@@ -2,7 +2,7 @@ var config = {
 
   tagline: "The Laboratory</br>Operating System",
   documentation_url: "http://localhost:4000/aquarium",
-  title: "Standard Libraries",
+  title: "UW BIOFAB Standard Libraries",
   navigation: [
 
     {
@@ -97,6 +97,12 @@ var config = {
             {
               name: 'OperationErrors',
               path: 'libraries/OperationErrors' + '.html',
+              type: "local-webpage"
+            },
+          
+            {
+              name: 'Pipettors',
+              path: 'libraries/Pipettors' + '.html',
               type: "local-webpage"
             },
           
