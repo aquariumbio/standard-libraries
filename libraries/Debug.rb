@@ -25,14 +25,23 @@ module Debug
     end
   end
 
-    def inspect(object, ident=nil)
-        show do
-            title "<span style=\"background-color:yellow\">INSPECTING #{ident} (#{object.class})</span>"
-            if object.kind_of?(Array)
-              table object
-            else
-              note object.to_json
-            end
-        end
+  def inspect(object, ident=nil)
+    show do
+      title "<span style=\"background-color:yellow\">INSPECTING #{ident} (#{object.class})</span>"
+      if object.kind_of?(Array)
+        table object
+      else
+        note object.to_json
+      end
     end
+  end
+
+  # Add options to the `Plan` for testing purposes
+  #
+  # @param operations [OperationList] the operations
+  # @param options [Hash] the options
+  def associate_plan_options(operations:, opts:)
+    plan = operations.first.plan
+    plan.associate(:options, opts.to_json)
+  end
 end
