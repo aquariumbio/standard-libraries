@@ -1,6 +1,4 @@
-# Workflow License (DRAFT, to be finalized by workflow author)
-
-MIT License
+# MIT License
 
 Copyright (c) 2020 University of Washington
 
