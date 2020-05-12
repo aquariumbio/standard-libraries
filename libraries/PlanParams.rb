@@ -5,26 +5,35 @@ module PlanParams
   # @return [Hash] plan_params
   def update_plan_params(plan_params:, opts:)
     if opts.present?
-      opts = JSON.parse(opts, { symbolize_names: true })
-      plan_params.update(opts)
+      plan_params.update(parse_options(opts))
     end
     plan_params
   end
 
-  #gets the options on the first operaton of a plan
-  def get_opts(operations)
-    get_op_opts(operations.first)
+  # Parses JSON formatted options
+  #
+  # @param opts [String] JSON-formatted string
+  # @return [Hash]
+  def parse_options(opts)
+    JSON.parse(opts, { symbolize_names: true })
   end
 
-  #gets the options on a specific operation
-  def get_op_opts(op)
-    op.plan.associations[:options]
-  end
+  # Get Plan options from a list of Operations; checks to to be sure that all 
+  #   Operations come from the same Plan
+  #
+  # @param operations [Array<Operation>] the Operations
+  # @return [String] the options
+  def strict_plan_options(operations)
+    plans = operations.map { |op| op.plan }.uniq
 
-  #sets plan params as a temporary association to the operation under the :plan_params key
-  def set_temporary_op_params(op, default_plan_parameters)
-      opts = get_op_opts(op)
-      op.temporary[:plan_params] = update_plan_params(plan_params: default_plan_params, opts: opts)
+    if plans.length > 1 
+      plan_ids = plans.map { |p| p.id }
+      msg = "Operations must all be from a single Plan." \
+      " #{plan_ids.length} Plans found: #{plan_ids.to_sentence}"
+      raise IncompatibleParametersError.new(msg)
+    end
+
+    operations.first.plan.associations[:options]
   end
   
   # Gets `:options` from the `Plan` associations and the `Operations` and uses 
