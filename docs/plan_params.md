@@ -1,4 +1,12 @@
-# PlanParams: a module for handling optional parameters passed to Plans and Operations
+# PlanParams: a module for handling optional parameters passed to `Plans` and `Operations`
+
+## Requirements
+To add options to the plan, use a data association with the key `options` and a JSON-formatted value. This can be done in the **Designer** tab by clicking on **Plan Info** and **Add Data**. It can also be done with [Trident](https://github.com/klavinslab/trident) using the method `my_plan.associate("options", "{"my_option": 2.0}")`. 
+
+Adding options to an `Operation` requires that the `OperationType` has an input parameter named `Options` that takes a JSON-formatted value. 
+
+## Behavior
+Optional parameters are divided into two groups: parameters that must be the same for all `Operations` in a `Job`, and parameters that can be different for different `Operations`. In code, the former are specified by including their keys in the `Hash` method `default_job_params` (see below), or any `Hash` that is passed to the `update_job_params` method. Before updating this `Hash`, the method will check that any keys in the `Hash` point to the same value in all `Operations`.
 
 ## Usage
 You can demo this module using the following code snippets in Nemo:
