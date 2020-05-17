@@ -35,13 +35,4 @@ module Debug
       end
     end
   end
-
-  # Add options to the `Plan` for testing purposes
-  #
-  # @param operations [OperationList] the operations
-  # @param options [Hash] the options
-  def associate_plan_options(operations:, opts:)
-    plan = operations.first.plan
-    plan.associate(:options, opts.to_json)
-  end
 end
