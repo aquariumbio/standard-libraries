@@ -28,7 +28,7 @@ module TemporaryTubeLabels
       when 2..5
         labels.join(", ")
       else
-        "#{labels.min}–#{labels.max}"
+        "#{labels.min}-#{labels.max}"
       end
     end
 
