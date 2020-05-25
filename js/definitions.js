@@ -24,6 +24,18 @@ var config = {
         contents: [
 
           
+            {
+              name: 'Options Test',
+              path: 'operation_types/Options_Test' + '.md',
+              type: "local-md"
+            },
+          
+            {
+              name: 'Pipettors Test',
+              path: 'operation_types/Pipettors_Test' + '.md',
+              type: "local-md"
+            },
+          
 
         ]
 
