@@ -84,6 +84,28 @@ module ItemActions
     end
   end
 
+  # Directions to layout materials for easy use
+  #
+  # @materials [Array<items>]
+  def layout_materials(materials)
+    show do
+      title 'Layout Materials'
+      note 'Please set out the following items for easy access'
+      table create_location_table(materials)
+    end
+  end
+
+  # Directions to retrieve materials
+  #
+  # @materials [Array<items>]
+  def retrieve_materials(materials)
+    show do
+      title 'Retrieve Materials'
+      note 'Please get the following items'
+      table create_location_table(materials)
+    end
+  end
+
   # Creates table directing technician on where to store materials
   #
   # @param collection [Collection] the materials that are to be put away
