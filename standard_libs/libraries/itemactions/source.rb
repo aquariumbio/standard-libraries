@@ -1,3 +1,6 @@
+# ItemAction
+# frozen_string_literal: true
+
 # Assists with basic actions of items (eg trashing, moving, etc)
 
 module ItemActions
@@ -6,9 +9,9 @@ module ItemActions
   #
   # @param operations [OperationList] the list of operations
   # @param location [String] the storage location
-  # @param type [String] the type of items to be stored ('item', 'collection', nil)
+  # @param type [String] the type of items to be stored('item', 'collection')
   def store_inputs(operations, location: nil, type: nil)
-    store_io(operations, role: 'inputs', location: location, type: type)
+    store_io(operations, role: 'input', location: location, type: type)
   end
 
   # Stores all items used in output operations
@@ -17,9 +20,9 @@ module ItemActions
   # @param operations [OperationList] the operation list where all
   #     output collections should be stored
   # @param location [String] the storage location
-  # @param type [String] the type of items to be stored ('item', 'collection', nil)
+  # @param type [String] the type of items to be stored ('item', 'collection')
   def store_outputs(operations, location: nil, type: nil)
-    store_io(operations, role: 'outputs', location: location, type: type)
+    store_io(operations, role: 'output', location: location, type: type)
   end
 
   # Stores all items of a certain role in the operations list
@@ -29,31 +32,28 @@ module ItemActions
   # @param role [String] whether material to be stored is an input or an output
   # @param location [String] the location to store the material
   # @param all_items [Boolean] an option to store all items not just collections
-  # @param type [String] the type of items to be stored ('item', 'collection', nil)
+  # @param type [String] the type of items to be stored ('item', 'collection')
   def store_io(operations, role: 'all', location: nil, type: nil)
-    items = []
+    items = Set[]; role.downcase!; type.downcase!
     operations.each do |op|
-      if role.nil?
-        raise 'Invalid role'
-      elsif role.downcase == 'inputs'
-        field_values = op.inputs
-      elsif role.downcase == 'outputs'
-        field_values = op.outputs
-      else
-        field_values = op.outputs + op.inputs
-      end
+      field_values = if role == 'input'
+                       yield op.inputs
+                     elsif role == 'output'
+                       yield op.outputs
+                     else
+                       yield (op.outputs + op.inputs)
+                     end
 
       unless type.nil?
-        if type.downcase == 'collection'
-          field_values.reject { |fv| fv.collection.nil? }
-        elsif type.downcase == 'item'
-          field_values.reject { |fv| !fv.collection.nil? }
+        if type == 'collection'
+          field_values.reject! { |fv| fv.object_type.handler == 'collection' }
+        elsif type == 'item'
+          field_values.select! { |fv| fv.object_type.handler == 'collection' }
         end
       end
 
       items.concat(field_values.map(&:item))
     end
-    items.uniq!
     store_items(items, location: location)
   end
 
@@ -63,8 +63,8 @@ module ItemActions
   # @param items [Array<items>] the things to be stored
   # @param location [String] Sets the location of the items if included
   def store_items(items, location: nil)
-    set_locations(items, location)
-    tab =  create_location_table(items)
+    set_locations(items, location) unless location.nil?
+    tab = create_location_table(items)
     show do
       title 'Put Away the Following Items'
       table tab
@@ -129,8 +129,6 @@ module ItemActions
       title 'Properly Dispose of the following items:'
       table tab
     end
-    items.each {|item| item.mark_as_deleted}
+    items.each { |item| item.mark_as_deleted }
   end
-    
-    
 end
