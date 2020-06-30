@@ -1,11 +1,18 @@
 needs "Standard Libs/Units"
-needs "Collection Management/CollectionDisplay"
 
 module Pipettors
 
   include Units
 
   # opts: [Hash] default {}, single channel pipettor
+  # Creates string with directions on which pipet to use and what
+  # to pipet to/from
+  #
+  # @param volume [{qty: int, unit: string}] the volume per Standard Libs Units
+  # @param source: [String] the source to pipet from
+  # @param destination: [String]the destination to pipet
+  # @param type [String] the type of pipettor if a specific one is desired
+  # @return [String] directions
   def pipet(volume:, source:, destination:, type: nil)
     pipettor = get_single_channel_pipettor(volume: volume,
                                            type: type)
@@ -16,6 +23,14 @@ module Pipettors
     )
   end
 
+  # Creates string with directions on which multi channel pipet to use and what
+  # to pipet to/from
+  #
+  # @param volume [{qty: int, unit: string}] the volume per Standard Libs Units
+  # @param source: [String] the source to pipet from
+  # @param destination: [String]the destination to pipet
+  # @param type [String] the type of pipettor if a specific one is desired
+  # @return [String] directions
   def multichannel_pipet(volume:, source:, destination:, type: nil)
     pipettor = get_multi_channel_pipettor(volume: volume, type: type)
     pipettor.pipet(
@@ -26,6 +41,11 @@ module Pipettors
     )
   end
 
+  # Returns a single channel pipet depending on the volume
+  # 
+  # @param volume [{qty: int, unit: string}] the volume per Standard Libs Units
+  # @param type [String] the type of pipettor if a specific one is desired
+  # @return [Pipet] A class of pipettor
   def get_single_channel_pipettor(volume:, type: nil)
     qty = type.present? ? Float::INFINITY : volume[:qty]
     if type == P2::NAME || qty <= 2
@@ -43,6 +63,11 @@ module Pipettors
     end
   end
 
+  # Returns a multi channel pipet depending on the volume
+  # 
+  # @param volume [{qty: int, unit: string}] the volume per Standard Libs Units
+  # @param type [String] the type of pipettor if a specific one is desired
+  # @return [Pipet] A class of pipettor
   def get_multi_channel_pipettor(volume:, type: nil)
     qty = type.present? ? Float::INFINITY : volume[:qty]
     if type == L8200XLS::NAME || qty <= 200
@@ -57,6 +82,12 @@ module Pipettors
     include Singleton
     include Units
 
+    # Gives directions to use pipet
+    #
+    # @param volume [{qty: int, unit: string}] the volume per Standard Libs Units
+    # @param source: [String] the source to pipet from
+    # @param destination: [String]the destination to pipet
+    # @return [String] directions
     def pipet(volume:, source:, destination:)
       max_volume = self.class::MAX_VOLUME
       if volume[:qty] <= max_volume
@@ -68,35 +99,16 @@ module Pipettors
         "Using a #{self.class::NAME}, pipette #{qty_display(volume)} TWICE from #{source} into #{destination}"
       end
     end
-  end
 
-  class MultiPipettor
-    include Singleton
-    include Units
-    include CollectionDisplay
-
-    def pipet(volume:, source:, destination:, association_map:)
-      max_volume = self.class::MAX_VOLUME
-      twice = false
-      volume[:qty] = volume[:qty].round(self.class::ROUND_TO)
-
-      if volume[:qty] <= 2 * max_volume && volume[:qty] >= max_volume
-        twice = true
-        volume[:qty] = (volume[:qty] / 2.0).round(self.class::ROUND_TO)
-      elsif volume[:qty] >= 2 * max_volume
-        raise 'It is not recommended to repeat pipet steps more than two times'
-      end
-
-      double = twice ? 'TWICE' : ''
-      "Using a #{self.class::NAME}, pipette #{qty_display(volume)} #{double} from #{source}, #{destination}"
-    end
-
+    # Returns the number of channels a pipettor has
+    #
+    # @return Int
     def channels
       self.class::CHANNELS
     end
   end
 
-  class LA61200XLS < MultiPipettor
+  class LA61200XLS < Pipettor
     NAME = 'Multi Channel Adjustable Space LA6 1200 Pipette'.freeze
     MIN_VOLUME = 200.0
     MAX_VOLUME = 1000.0
@@ -104,7 +116,7 @@ module Pipettors
     CHANNELS = 6
   end
 
-  class L8200XLS < MultiPipettor
+  class L8200XLS < Pipettor
     NAME = 'Multi Channel L8 200XLS Pipette'.freeze
     MIN_VOLUME = 20.0
     MAX_VOLUME = 200.0
@@ -117,6 +129,7 @@ module Pipettors
     MIN_VOLUME = 0.0
     MAX_VOLUME = 2.0
     ROUND_TO = 1
+    CHANNELS = 1
   end
 
   class P20 < Pipettor
@@ -124,6 +137,7 @@ module Pipettors
     MIN_VOLUME = 2.0
     MAX_VOLUME = 20.0
     ROUND_TO = 1
+    CHANNELS = 1
   end
 
   class P200 < Pipettor
@@ -131,6 +145,7 @@ module Pipettors
     MIN_VOLUME = 20.0
     MAX_VOLUME = 200.0
     ROUND_TO = 0
+    CHANNELS = 1
   end
 
   class P1000 < Pipettor
@@ -138,6 +153,7 @@ module Pipettors
     MIN_VOLUME = 200.0
     MAX_VOLUME = 1000.0
     ROUND_TO = 0
+    CHANNELS = 1
   end
 
   class PipetController < Pipettor
@@ -145,6 +161,7 @@ module Pipettors
     MIN_VOLUME = 2000.0
     MAX_VOLUME = 50000.0
     ROUND_TO = 0
+    CHANNELS = 1
   end
 
 end
