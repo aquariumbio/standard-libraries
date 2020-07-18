@@ -4,7 +4,6 @@ module Pipettors
 
   include Units
 
-  # opts: [Hash] default {}, single channel pipettor
   # Creates string with directions on which pipet to use and what
   # to pipet to/from
   #
