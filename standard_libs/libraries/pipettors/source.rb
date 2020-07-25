@@ -68,10 +68,10 @@ module Pipettors
   # @return [Pipet] A class of pipettor
   def get_multi_channel_pipettor(volume:, type: nil)
     qty = type.present? ? Float::INFINITY : volume[:qty]
-    if type == L8200XLS::NAME || qty <= 200
-      L8200XLS.instance
-    elsif type == LA61200XLS::NAME || qty <= 1000
-      LA61200XLS.instance
+    if type == P8X200::NAME || qty <= 200
+      P8X200.instance
+    elsif type == PA6X1200::NAME || qty <= 1000
+      PA6X1200.instance
     end
   end
 
@@ -113,16 +113,16 @@ module Pipettors
     end
   end
 
-  class LA61200XLS < Pipettor
-    NAME = 'Multi Channel Adjustable Space LA6 1200'.freeze
+  class PA6X1200 < Pipettor
+    NAME = '6 Channel Adjustable Space P1200'.freeze
     MIN_VOLUME = 200.0
     MAX_VOLUME = 1000.0
     ROUND_TO = 0
     CHANNELS = 6
   end
 
-  class L8200XLS < Pipettor
-    NAME = 'Multi Channel L8 200XLS'.freeze
+  class P8X200 < Pipettor
+    NAME = '8 Channel P200'.freeze
     MIN_VOLUME = 20.0
     MAX_VOLUME = 200.0
     ROUND_TO = 0
