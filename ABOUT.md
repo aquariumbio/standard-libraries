@@ -1,6 +1,6 @@
-# UW BIOFAB Standard Libraries, version 0.0.1
+# Standard Libraries, version 0.0.1
 
-Standard libraries for UW BIOFAB [[Download](standard-libraries.aq)] [[Github Repo](https://github.com/klavinslab/standard-libraries)]
+Standard libraries for UW BIOFAB, Klavins Lab, and others [[Download](standard-libraries.aq)] [[Github Repo](https://github.com/aquariumbio/standard-libraries)]
 
 &copy; University of Washington
 
