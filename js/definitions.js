@@ -2,7 +2,7 @@ var config = {
 
   tagline: "The Laboratory</br>Operating System",
   documentation_url: "http://localhost:4000/aquarium",
-  title: "UW BIOFAB Standard Libraries",
+  title: "Standard Libraries",
   navigation: [
 
     {
@@ -11,7 +11,7 @@ var config = {
         { name: "Introduction", type: "local-md", path: "README.md" },
         { name: "About this Workflow", type: "local-md", path: "ABOUT.md" },
         { name: "License", type: "local-md", path: "LICENSE.md" },
-        { name: "Issues", type: "external-link", path: 'https://github.com/klavinslab/standard-libraries/issues' }
+        { name: "Issues", type: "external-link", path: 'https://github.com/aquariumbio/standard-libraries/issues' }
       ]
     },
 
@@ -33,6 +33,12 @@ var config = {
             {
               name: 'Pipettors Test',
               path: 'operation_types/Pipettors_Test' + '.md',
+              type: "local-md"
+            },
+          
+            {
+              name: 'Provenance Test',
+              path: 'operation_types/Provenance_Test' + '.md',
               type: "local-md"
             },
           
@@ -91,6 +97,12 @@ var config = {
             {
               name: 'InputOutput',
               path: 'libraries/InputOutput' + '.html',
+              type: "local-webpage"
+            },
+          
+            {
+              name: 'ItemActions',
+              path: 'libraries/ItemActions' + '.html',
               type: "local-webpage"
             },
           
@@ -161,6 +173,12 @@ var config = {
             },
           
             {
+              name: 'TubeRack',
+              path: 'libraries/TubeRack' + '.html',
+              type: "local-webpage"
+            },
+          
+            {
               name: 'Units',
               path: 'libraries/Units' + '.html',
               type: "local-webpage"
@@ -169,6 +187,12 @@ var config = {
             {
               name: 'UploadHelper',
               path: 'libraries/UploadHelper' + '.html',
+              type: "local-webpage"
+            },
+          
+            {
+              name: 'WorkSpace',
+              path: 'libraries/WorkSpace' + '.html',
               type: "local-webpage"
             },
           
@@ -183,10 +207,28 @@ var config = {
       { category: "Sample Types",
         contents: [
           
+            {
+              name: 'Primer/Probe Mix',
+              path: 'sample_types/Primer_Probe_Mix'  + '.md',
+              type: "local-md"
+            },
+          
         ]
       },
       { category: "Containers",
         contents: [
+          
+            {
+              name: 'Lyophilized Primer Mix',
+              path: 'object_types/Lyophilized_Primer_Mix'  + '.md',
+              type: "local-md"
+            },
+          
+            {
+              name: 'Primer Mix Aliquot',
+              path: 'object_types/Primer_Mix_Aliquot'  + '.md',
+              type: "local-md"
+            },
           
         ]
       }
