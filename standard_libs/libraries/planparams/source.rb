@@ -33,7 +33,7 @@ module PlanParams
   def strict_plan_options(operations)
     plans = operations.map(&:plan).uniq
 
-    if plans.length > 1
+    if plans.length > 1 && !debug
       plan_ids = plans.map(&:id)
       msg = 'Operations must all be from a single Plan.' \
       " #{plan_ids.length} Plans found: #{plan_ids.to_sentence}"
