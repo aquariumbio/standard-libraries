@@ -130,4 +130,26 @@ module ItemActions
     end
     items.each { |item| item.mark_as_deleted }
   end
+
+  # Instructions to fill media reservoir
+  # TODO: Not sure this belongs here
+  #
+  # @param media (item)
+  # @param volume [Volume]
+  def show_fill_reservoir(media, unit_volume, number_items)
+    total_vol = { units: unit_volume[:units], qty: calculate_volume_extra(unit_volume, number_items) }
+    show do
+      title 'Fill Media Reservoir'
+      check 'Get a media reservoir'
+      check pipet(volume: total_vol,
+                  source: "<b>#{media.id}</b>",
+                  destination: '<b>Media Reservoir</b>')
+    end
+  end
+
+  def calculate_volume_extra(unit_volume, number_items)
+    raw_vol = (unit_volume[:qty] * number_items)
+    addition = raw_vol * 0.15 #15% more volume
+    (raw_vol + addition).ceil
+  end
 end
