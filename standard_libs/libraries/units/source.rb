@@ -2,57 +2,43 @@ module Units
     
     EMPTY = -1
     
-    # Special Characters
-    MU = '&mu;'
-    DEGREES = '&deg;'
-    
-    # Prefixes
-    PICO = 'p'
-    NANO = 'n'
-    MICRO = MU
-    MILLI = 'm'
-    KILO = 'k'
-    MEGA = 'M'
-    GIGA = 'G'
-    
     # Volume
-    LITERS = 'l'
-    MICROLITERS = MICRO + LITERS
-    MILLILITERS = MILLI + LITERS
+    MICROLITERS = 'ul'
+    MILLILITERS = 'ml'
     
     # Weight
-    GRAMS = 'g'
-    NANOGRAMS = NANO + GRAMS
-    MICROGRAMS = MICRO + GRAMS
+    NANOGRAMS = 'ng'
+    MICROGRAMS = 'g'
     
     # Concentration
+    PICOMOLAR = 'pM'
+    NANOMOLAR = 'nM'
+    MICROMOLAR = 'M'
+    MILLIMOLAR = 'mM'
     MOLAR = 'M'
-    PICOMOLAR = PICO + MOLAR
-    NANOMOLAR = NANO + MOLAR
-    MICROMOLAR = MICRO + MOLAR
-    MILLIMOLAR = MILLI + MOLAR
     
     # Temperature
-    CELSIUS = 'C'
-    DEGREES_C = DEGREES + CELSIUS
+    DEGREES_C = 'C'
     
     # Time
     MINUTES = 'min'
     SECONDS = 'sec'
     HOURS ='hr'
-    
     # Force
     TIMES_G = 'x g'
     
     # R/DNA Length
     BASEPAIRS = 'bp'
-    KILOBASEPAIRS = KILO + BASEPAIRS
-    MEGABASEPAIRS = MEGA + BASEPAIRS
-    GIGABASEPAIRS = GIGA + BASEPAIRS
+    KILOBASEPAIRS = 'kbp'
+    MEGABASEPAIRS = 'mbp'
+    GIGABASEPAIRS = 'gbp'
     
     # Voltage
     VOLTS = 'V'
-    MILLIVOLTS = MILLI + VOLTS
+
+    def create_qty(qty:, units:)
+      {qty: qty, units: units}
+    end
 
     def self.qty_display(qty)
         "#{qty[:qty]} #{qty[:units]}"
