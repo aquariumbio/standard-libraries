@@ -26,6 +26,8 @@ module Units
     HOURS ='hr'
     # Force
     TIMES_G = 'x g'
+    # Rotations
+    RPM = 'rpm'
     
     # R/DNA Length
     BASEPAIRS = 'bp'

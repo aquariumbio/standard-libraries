@@ -27,4 +27,15 @@ module WorkSpace
       bullet 'Change outer layer of gloves after handling infectious sample and before touching surfaces outside of the BSC (such as a refrigerator door handle).'
     end
   end
+
+  def clean_workspace
+    show do
+      title 'Clean Workspace'
+      note 'Clean any contaminated workspaces or work tools'
+      note 'Assume that any surface touched or tool used is contaminated'
+      note 'Using fresh paper wipe clean with:'
+      check 'Bleach'
+      check '70% EtOH'
+    end
+  end
 end

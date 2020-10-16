@@ -2,7 +2,79 @@
 
 # Assists with basic actions of items (eg trashing, moving, etc)
 
+needs 'Small Instruments/Shakers'
+needs 'Standard Libs/Units'
+
 module ItemActions
+
+  include Shakers
+  include Units
+
+  # Instructs tech to remove supernatant and discard
+  #
+  # @param item [Item]
+  def remove_discard_supernatant(items)
+    show do
+      title 'Remove Supernatant'
+      note 'Remove and discard supernatant from:'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
+  # Instructs tech to check items for bubbles
+  #
+  # @param items [Array<item>]
+  # @param responses [Array<[boolean, item]>]
+  def show_inspect_for_bubbles(item)
+    responses = show do
+      title 'Check For Bubbles'
+      note 'Check following item for bubbles'
+      select(['true', 'false'],
+              var: 'bubbles'.to_sym,
+              label: item.to_s,
+              default: 2)
+    end
+    response = responses['bubbles'.to_sym].to_s
+    response = ['true', 'false'].sample if debug
+    if response == 'true'
+      true
+    elsif response == 'false'
+      false
+    end
+  end
+
+
+  # instructions to thaw items
+  #
+  # @param items [Item, Collection, String]
+  def show_thaw_items(items)
+    show do
+      title 'Thaw items'
+      note 'Thaw the following items'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
+  # Instructions to incubate items
+  #
+  # @param
+  def show_incubate_items(items:, time:, temperature:)
+    show do
+      title 'Incubate Items'
+      note 'Incubate the following items per instructions below'
+      note "Temperature: <b>#{qty_display(temperature)}</b>"
+      note "Time: <b>#{qty_display(time)}</b>"
+      note 'Items:'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
   # Store all items used in input operations
   # Assumes all inputs are non nil
   #
@@ -98,6 +170,8 @@ module ItemActions
   #
   # @materials [Array<items>]
   def retrieve_materials(materials)
+    return unless materials.present?
+
     show do
       title 'Retrieve Materials'
       note 'Please get the following items'
@@ -157,13 +231,7 @@ module ItemActions
       objs = [objs]
     end
 
-    show do
-      title 'Vortex Plate'
-      note 'Please vortex the following plates'
-      objs.each do |obj|
-        note obj
-      end
-    end
+    shake(items: objs)
   end
 
   def flick_to_remove_bubbles(objs)

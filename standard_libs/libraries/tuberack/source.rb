@@ -72,6 +72,7 @@ module TubeRack
     end
 
     def get_non_empty
+      @matrix.each do |
       @matrix.select { |x| x != EMPTY}
     end
 
