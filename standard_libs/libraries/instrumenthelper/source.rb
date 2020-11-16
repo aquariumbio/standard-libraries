@@ -38,7 +38,7 @@ module InstrumentHelper
     ops_to_remove = []
     return if ops.nil?
     ops.each do |op|
-      op.error(:unavailablethermocycler, 'No thermocyclers were available')
+      op.error(:instrument_unavailable, 'No instruments were available')
       op.status = 'pending'
       op.save
       ops_to_remove.push(op)

@@ -216,7 +216,7 @@ module ItemActions
       check 'Get a media reservoir'
       check pipet(volume: total_vol,
                   source: "<b>#{media.id}</b>",
-                  destination: '<b>Media Reservoir</b>')
+                  destination: '</b>a <b>Media Reservoir</b>')
     end
   end
 
@@ -226,12 +226,87 @@ module ItemActions
     (raw_vol + addition).ceil
   end
 
+
+  # Finds an item unless item is already specified
+  #
+  # @param sample [Sample] the sample
+  # @param object_type [ObjectType] object type
+  # @return [Item]
+  def find_random_item(sample:, object_type:)
+    raise ItemActionError, 'Sample is nil' unless sample.present?
+
+    raise ItemActionError, 'Object type is nil' unless object_type.present?
+
+    ot = object_type.is_a?(ObjectType) ? object_type : ObjectType.find_by_name(object_type)
+
+    unless ot.is_a? ObjectType
+      raise ItemActionError, "Object Type is Nil #{object_type}"
+    end
+
+    ite = Item.where(sample_id: sample.id,
+                     object_type: ot).last
+
+    return ite if ite.present?
+
+    raise ItemActionError, "Item Not found sample: #{sample.id}, ot: #{ot.name}"
+  end
+
+  # Makes an Item or fills a collection with that samples
+  #
+  # @param sample [Sample]
+  # @param object_type [ObjectType]
+  # @param lot_number [String]
+  # @param association_map [AssociationMap] same as in collection management
+  # @return [Item]
+  def make_item(sample:, object_type:, lot_number: nil, association_map: nil)
+    raise ItemActionError, 'Sample ID is nil' if sample.nil?
+
+    object_type = ObjectType.find_by_name(object_type) if object_type.is_a? String
+    item = nil
+    if object_type.handler == 'collection'  # TODO find out why some ObjectTypes dont have .collection_type?
+      item = Collection.new_collection(object_type)
+      length = association_map.present? ? association_map.length : item.get_empty.length
+      samples = Array.new(length, sample)
+      zipped_map = if association_map.present?
+                     samples.zip(association_map)
+                   else
+                     samples
+                   end
+      zipped_map.each do |samp, map|
+        next if samp.nil?
+
+        if map.nil?
+          item.add_one(samp)
+          next
+        end
+        item.set(map[:to_loc][0], map[:to_loc][1], samp)
+      end
+    else
+      item = sample.make_item(object_type.name.to_s)
+    end
+    item.associate(LOT_NUM, lot_number) if lot_number.present?
+    item
+  end
+
   def vortex_objs(objs)
     unless objs.is_a? Array
       objs = [objs]
     end
 
     shake(items: objs)
+  end
+
+  # Directions to label objects with labels
+  # Will display exactly labels and exactly objects
+  #
+  # @param objects [String able object]
+  def label_items(objects:, labels:)
+    show do
+      title 'Label the Following'
+      objects.zip(labels).each do |obj, label|
+        bullet "#{obj}: <b> #{label}</b>"
+      end
+    end
   end
 
   def flick_to_remove_bubbles(objs)
@@ -248,3 +323,5 @@ module ItemActions
     end
   end
 end
+
+class ItemActionError < ProtocolError; end
