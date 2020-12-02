@@ -216,7 +216,7 @@ module ItemActions
       check 'Get a media reservoir'
       check pipet(volume: total_vol,
                   source: "<b>#{media.id}</b>",
-                  destination: '</b>a <b>Media Reservoir</b>')
+                  destination: '<b>Media Reservoir</b>')
     end
   end
 
