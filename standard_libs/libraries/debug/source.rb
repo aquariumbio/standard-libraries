@@ -25,14 +25,14 @@ module Debug
     end
   end
 
-    def inspect(object, ident=nil)
-        show do
-            title "<span style=\"background-color:yellow\">INSPECTING #{ident} (#{object.class})</span>"
-            if object.kind_of?(Array)
-              table object
-            else
-              note object.to_json
-            end
-        end
+  def inspect(object, ident=nil)
+    show do
+      title "<span style=\"background-color:yellow\">INSPECTING #{ident} (#{object.class})</span>"
+      if object.kind_of?(Array)
+        table object
+      else
+        note object.to_json
+      end
     end
+  end
 end
