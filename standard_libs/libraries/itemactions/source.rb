@@ -2,7 +2,79 @@
 
 # Assists with basic actions of items (eg trashing, moving, etc)
 
+needs 'Small Instruments/Shakers'
+needs 'Standard Libs/Units'
+
 module ItemActions
+
+  include Shakers
+  include Units
+
+  # Instructs tech to remove supernatant and discard
+  #
+  # @param item [Item]
+  def remove_discard_supernatant(items)
+    show do
+      title 'Remove Supernatant'
+      note 'Remove and discard supernatant from:'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
+  # Instructs tech to check items for bubbles
+  #
+  # @param items [Array<item>]
+  # @param responses [Array<[boolean, item]>]
+  def show_inspect_for_bubbles(item)
+    responses = show do
+      title 'Check For Bubbles'
+      note 'Check following item for bubbles'
+      select(['true', 'false'],
+              var: 'bubbles'.to_sym,
+              label: item.to_s,
+              default: 2)
+    end
+    response = responses['bubbles'.to_sym].to_s
+    response = ['true', 'false'].sample if debug
+    if response == 'true'
+      true
+    elsif response == 'false'
+      false
+    end
+  end
+
+
+  # instructions to thaw items
+  #
+  # @param items [Item, Collection, String]
+  def show_thaw_items(items)
+    show do
+      title 'Thaw items'
+      note 'Thaw the following items'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
+  # Instructions to incubate items
+  #
+  # @param
+  def show_incubate_items(items:, time:, temperature:)
+    show do
+      title 'Incubate Items'
+      note 'Incubate the following items per instructions below'
+      note "Temperature: <b>#{qty_display(temperature)}</b>"
+      note "Time: <b>#{qty_display(time)}</b>"
+      note 'Items:'
+      items.each do |item|
+        bullet item.to_s
+      end
+    end
+  end
+
   # Store all items used in input operations
   # Assumes all inputs are non nil
   #
@@ -98,6 +170,8 @@ module ItemActions
   #
   # @materials [Array<items>]
   def retrieve_materials(materials)
+    return unless materials.present?
+
     show do
       title 'Retrieve Materials'
       note 'Please get the following items'
@@ -130,4 +204,124 @@ module ItemActions
     end
     items.each { |item| item.mark_as_deleted }
   end
+
+  # Instructions to fill media reservoir
+  #
+  # @param media (item)
+  # @param volume [Volume]
+  def show_fill_reservoir(media, unit_volume, number_items)
+    total_vol = { units: unit_volume[:units], qty: calculate_volume_extra(unit_volume, number_items) }
+    show do
+      title 'Fill Media Reservoir'
+      check 'Get a media reservoir'
+      check pipet(volume: total_vol,
+                  source: "<b>#{media.id}</b>",
+                  destination: '<b>Media Reservoir</b>')
+    end
+  end
+
+  def calculate_volume_extra(unit_volume, number_items)
+    raw_vol = (unit_volume[:qty] * number_items)
+    addition = raw_vol * 0.15 #15% more volume
+    (raw_vol + addition).ceil
+  end
+
+
+  # Finds an item unless item is already specified
+  #
+  # @param sample [Sample] the sample
+  # @param object_type [ObjectType] object type
+  # @return [Item]
+  def find_random_item(sample:, object_type:)
+    raise ItemActionError, 'Sample is nil' unless sample.present?
+
+    raise ItemActionError, 'Object type is nil' unless object_type.present?
+
+    ot = object_type.is_a?(ObjectType) ? object_type : ObjectType.find_by_name(object_type)
+
+    unless ot.is_a? ObjectType
+      raise ItemActionError, "Object Type is Nil #{object_type}"
+    end
+
+    ite = Item.where(sample_id: sample.id,
+                     object_type: ot).last
+
+    return ite if ite.present?
+
+    raise ItemActionError, "Item Not found sample: #{sample.id}, ot: #{ot.name}"
+  end
+
+  # Makes an Item or fills a collection with that samples
+  #
+  # @param sample [Sample]
+  # @param object_type [ObjectType]
+  # @param lot_number [String]
+  # @param association_map [AssociationMap] same as in collection management
+  # @return [Item]
+  def make_item(sample:, object_type:, lot_number: nil, association_map: nil)
+    raise ItemActionError, 'Sample ID is nil' if sample.nil?
+
+    object_type = ObjectType.find_by_name(object_type) if object_type.is_a? String
+    item = nil
+    if object_type.handler == 'collection'  # TODO find out why some ObjectTypes dont have .collection_type?
+      item = Collection.new_collection(object_type)
+      length = association_map.present? ? association_map.length : item.get_empty.length
+      samples = Array.new(length, sample)
+      zipped_map = if association_map.present?
+                     samples.zip(association_map)
+                   else
+                     samples
+                   end
+      zipped_map.each do |samp, map|
+        next if samp.nil?
+
+        if map.nil?
+          item.add_one(samp)
+          next
+        end
+        item.set(map[:to_loc][0], map[:to_loc][1], samp)
+      end
+    else
+      item = sample.make_item(object_type.name.to_s)
+    end
+    item.associate(LOT_NUM, lot_number) if lot_number.present?
+    item
+  end
+
+  def vortex_objs(objs)
+    unless objs.is_a? Array
+      objs = [objs]
+    end
+
+    shake(items: objs)
+  end
+
+  # Directions to label objects with labels
+  # Will display exactly labels and exactly objects
+  #
+  # @param objects [String able object]
+  def label_items(objects:, labels:)
+    show do
+      title 'Label the Following'
+      objects.zip(labels).each do |obj, label|
+        bullet "#{obj}: <b> #{label}</b>"
+      end
+    end
+  end
+
+  def flick_to_remove_bubbles(objs)
+    unless objs.is_a? Array
+      objs = [objs]
+    end
+
+    show do
+      title 'Flick to Remove Bubbles'
+      note 'Carefully flick to breakdown and remove bubbles'
+      objs.each do |obj|
+        note obj
+      end
+    end
+  end
 end
+
+class ItemActionError < ProtocolError; end

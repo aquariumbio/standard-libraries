@@ -34,6 +34,52 @@ module AssociationManagement
     AssociationMap.get_associated_data(object, key, opts)
   end
 
+  # Handles associations and provenance for volume transfers
+  #
+  # volume the volume
+  # @param key [string] the data key
+  # @param to_item [Item] the item that its being transferred to
+  # @param from_item [Item, string] will NOT do provenance if not Item
+  def item_to_item_vol_transfer(volume:, key:, to_item:, from_item:)
+    from_obj_to_obj_provenance(to_item: to_item, from_item: from_item,
+                               additional_relation_data: { key => volume })
+  end
+
+  # Add provenance data to a source-destination pair of items
+  #
+  # @param from_item [Item]
+  # @param to_item [Item]
+  # @param additional_relation_data [serializable object] additional data that
+  #   will be added to the provenace association
+  # @return [void]
+  def from_obj_to_obj_provenance(from_item:, to_item:,
+                                 additional_relation_data: nil)
+    raise "Object #{to_item.id} is not an item #{to_item.class.to_s}" unless to_item.is_a? Item
+    raise "Object #{from_item.id} is not an item" unless from_item.is_a? Item
+
+    to_map = AssociationMap.new(to_item)
+
+    add_provenance(
+      from: from_item,
+      to: to_item, to_map: to_map,
+      additional_relation_data: additional_relation_data
+    )
+    to_map.save
+  end
+
+  # Records the volume transferred
+  #
+  # @param transfer_vol [{qty: int, units: string}]
+  # @param to_item: part that is being transferred to
+  # @param from_item: part that is being transferred from
+  def associate_transfer_vol(volume:, key:, to_item:, from_item:)
+    volume = 'unknown' unless volume.present?
+    vol_transfer_array = get_associated_data(to_item, key)
+    vol_transfer_array = [] if vol_transfer_array.nil?
+    vol_transfer_array.push({volume: volume, from_item: from_item})
+    associate_data(to_item, key, vol_transfer_array)
+  end
+
   # Defines a map to manage the associations for an {Item}, {Operation}, or
   # {Plan} object, which are Aquarium classes that extend {DataAssociator}.
   #
@@ -103,6 +149,11 @@ module AssociationManagement
       elsif opts[:coord]
         assoc_map = AssociationMap.new(object)
         assoc_map.putrc(opts[:coord][0], opts[:coord][1], key, data)
+      elsif object.is_part
+        collection = Collection.find(object.containing_collection.id)
+        assoc_map = AssociationMap.new(collection)
+        row, column = collection.find(object).first
+        assoc_map.putrc(row, column, key, data)
       else # Normal case that deals directly with object
         assoc_map = AssociationMap.new(object)
         assoc_map.put(key, data)
@@ -133,6 +184,11 @@ module AssociationManagement
       elsif opts[:coord]
         assoc_map = AssociationMap.new(object)
         return assoc_map.getrc(opts[:coord][0], opts[:coord][1], key)
+      elsif object.is_part
+        collection = Collection.find(object.containing_collection.id)
+        assoc_map = AssociationMap.new(collection)
+        row, column = collection.find(object).first
+        return assoc_map.getrc(row, column, key)
       else # Normal case that deals directly with object
         assoc_map = AssociationMap.new(object)
         return assoc_map.get(key)
