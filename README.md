@@ -1,5 +1,7 @@
 # Standard libraries required by many workflows written for the UW BIOFAB and Klavins Lab
 
+**WARNING: This repo has been merged into [protocol-base](https://github.com/aquariumbio/protocol-base) and future updates will happen there. Please consider using that repo instead.**
+
 ## About this repository 
 This repository contains two sets of files:
 - One, with files located in `standard_libs` and `test`, is managed by [pfish](https://github.com/klavinslab/pfish).
